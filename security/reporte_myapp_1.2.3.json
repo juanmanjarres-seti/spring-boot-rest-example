@@ -1,0 +1,78 @@
+{
+  "artefacto": {
+    "nombre": "myapp:1.2.3",
+    "tipo": "container_image",
+    "ambiente": "production",
+    "scanner": "trivy"
+  },
+  "resumen": {
+    "total": 2,
+    "critica": 1,
+    "alta": 1,
+    "media": 0,
+    "baja": 0
+  },
+  "vulnerabilidades": [
+    {
+      "id": "CVE-2024-1234",
+      "paquete": "openssl",
+      "version_instalada": "3.0.11-1",
+      "version_corregida": "3.0.14-1",
+      "severidad": "CRITICA",
+      "titulo": "OpenSSL: Buffer overflow en la verificación de certificados X.509",
+      "score_cvss": 9.8,
+      "recomendacion": {
+        "accion": "Actualizar el paquete openssl a la versión corregida de inmediato.",
+        "pasos": [
+          "Verificar la versión instalada: dpkg -l openssl",
+          "Ejecutar: apt-get update && apt-get install --only-upgrade openssl=3.0.14-1",
+          "Reconstruir y redesplegar la imagen del contenedor myapp:1.2.3",
+          "Validar: openssl version",
+          "Ejecutar nuevamente el escaneo con Trivy para confirmar la remediación"
+        ],
+        "esfuerzo": "BAJO",
+        "prioridad": 1,
+        "confianza_remediacion": 0.95
+      },
+      "files_involucrados": [
+        {
+          "ruta": "Dockerfile",
+          "analisis": "La imagen base instala openssl 3.0.11-1 explícitamente. Actualizar la línea de apt-get para fijar la versión 3.0.14-1 o superior."
+        },
+        {
+          "ruta": "src/crypto/tls_helper.py",
+          "analisis": "Este módulo invoca directamente el binario openssl para verificar certificados X.509, quedando expuesto al buffer overflow hasta que se actualice el paquete."
+        }
+      ]
+    },
+    {
+      "id": "CVE-2024-5678",
+      "paquete": "libexpat1",
+      "version_instalada": "2.5.0-1",
+      "version_corregida": "2.6.2-1",
+      "severidad": "ALTA",
+      "titulo": "Expat: Desbordamiento de entero en el procesamiento de XML",
+      "score_cvss": 7.5,
+      "recomendacion": {
+        "accion": "Actualizar libexpat1 a la versión que contiene el parche de seguridad.",
+        "pasos": [
+          "Verificar la versión instalada: dpkg -l libexpat1",
+          "Ejecutar: apt-get update && apt-get install --only-upgrade libexpat1=2.6.2-1",
+          "Reconstruir la imagen del contenedor",
+          "Verificar dependencias: apt-cache rdepends libexpat1",
+          "Validar con Trivy que la vulnerabilidad fue resuelta"
+        ],
+        "esfuerzo": "BAJO",
+        "prioridad": 2,
+        "confianza_remediacion": 0.9
+      },
+      "files_involucrados": [
+        {
+          "ruta": "Dockerfile",
+          "analisis": "libexpat1 se instala como dependencia transitiva de otros paquetes del sistema en la imagen debian:12.5. Actualizar el paquete y reconstruir la imagen."
+        }
+      ]
+    }
+  ],
+  "generado_en": "2026-04-21T10:30:00Z"
+}
